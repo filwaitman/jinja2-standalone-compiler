@@ -3,3 +3,6 @@
 __pycache__
 *~
 html_templates/
+dist/
+*.egg-info/
+
