@@ -14,8 +14,7 @@ def compile_template(skeleton_path):
     '''
     environment = Environment(loader=FileSystemLoader([INPUT_FOLDER]), trim_blocks=True, lstrip_blocks=True)
     template = environment.get_template(skeleton_path)
-    rendered = template.render()
-    return rendered
+    return template.render()
 
 
 def main():
@@ -27,7 +26,7 @@ def main():
             os.makedirs(OUTPUT_FOLDER)
 
         with open(template_name, 'w') as f:
-            f.write(compile_template(jinja_template))
+            f.write(compile_template(jinja_template).encode('utf-8'))
 
 
 if __name__ == '__main__':
