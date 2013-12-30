@@ -24,4 +24,4 @@ This aims to be stupidly simple - in order to be used to whom have never heard a
 
 ### Run tests:
 * `pip install -r requirements_test.txt`
-* `PYTHONPATH=.. py.test`
+* `PYTHONPATH=. py.test`
