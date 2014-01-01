@@ -30,4 +30,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception, e:
+        print 'ERROR: %s' % str(e)
+    else:
+        print 'Done!'
+    raw_input('Press any key to continue...')
