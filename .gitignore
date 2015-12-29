@@ -6,4 +6,4 @@ html_templates/
 dist/
 *.egg-info/
 .env
-
+.cache

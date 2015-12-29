@@ -2,7 +2,7 @@
 import os
 import shutil
 
-import settings, jinja2_standalone_compiler
+import jinja2_standalone_compiler
 
 fixtures_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures')
 

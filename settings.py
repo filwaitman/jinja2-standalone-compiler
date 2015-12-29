@@ -15,3 +15,10 @@ INPUT_FOLDER = current_dir + '/jinja_templates'
 
 # OPTIONAL: Which folder does it dump generated templates? - Defaults to 'html_templates' folder inside this project
 OUTPUT_FOLDER = current_dir + '/html_templates'
+
+# OPTIONAL: Do you have any additional variables to the templates? (use "'key': value" format)
+EXTRA_VARIABLES = {
+    # 'project_name': 'WaitCorp',
+    # 'current_year': 2042,
+    # 'debug': False,
+}

@@ -1,21 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import glob
 import os
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
-from settings import INPUT_FOLDER, OUTPUT_FOLDER, OUTPUT_TEMPLATES
+from settings import INPUT_FOLDER, OUTPUT_FOLDER, OUTPUT_TEMPLATES, EXTRA_VARIABLES
 
 
 def compile_template(skeleton_path):
-    '''
-        Returns a string with its generated content.
-        @skeleton_path (str): template basis to be used to render final template. Use relative path, considering from INPUT_FOLDER on.
+    '''Returns a string with its generated content.
+
+    :param skeleton_path: template basis to be used to render final template.  Use relative path, (from INPUT_FOLDER on)
+    :type skeleton_path: str or unicode
+    :returns: formatted string
+    :rtype: str or unicode
     '''
     environment = Environment(loader=FileSystemLoader([INPUT_FOLDER]), trim_blocks=True, lstrip_blocks=True)
+    environment.undefined = StrictUndefined
     template = environment.get_template(skeleton_path)
-    return template.render()
+    return template.render(EXTRA_VARIABLES)
 
 
 def main():
