@@ -57,7 +57,7 @@ def main(path, settings=None):
 
 
 @click.command()
-@click.option('--path', help='Base path to jinja files (it is recursive.')
+@click.argument('path', help='Base path to jinja files (it is recursive.')
 @click.option('--settings', default=None, help='Settings file to use.')
 def main_command(path, settings=None):
     current_dir = os.getcwd()
