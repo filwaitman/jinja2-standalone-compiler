@@ -46,8 +46,12 @@ def main(settings=None, path=None):
         html_template = '{}.html'.format(html_template)
 
         print 'DOING', html_template
-        with open(html_template, 'w') as f:
-            f.write(render_template(jinja_template, extra_variables=extra_variables).encode('utf-8'))
+        try:
+            with open(html_template, 'w') as f:
+                f.write(render_template(jinja_template, extra_variables=extra_variables).encode('utf-8'))
+        except:
+            os.unlink(html_template)
+            raise
 
 
 @click.command()

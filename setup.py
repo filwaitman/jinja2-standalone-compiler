@@ -10,8 +10,8 @@ setup(
     author='Filipe Waitman',
     author_email='filwaitman@gmail.com',
     install_requires=[x.strip() for x in open('requirements.txt').readlines()],
-    url='https://github.com/filwaitman/jinja2_standalone_compiler',
-    download_url='https://github.com/filwaitman/jinja2_standalone_compiler/tarball/{}'.format(VERSION),
+    url='https://github.com/filwaitman/jinja2-standalone-compiler',
+    download_url='https://github.com/filwaitman/jinja2-standalone-compiler/tarball/{}'.format(VERSION),
     keywords=['cache', 'caching', 'memcached', 'redis'],
     test_suite='tests',
     classifiers=[

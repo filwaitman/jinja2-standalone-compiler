@@ -60,5 +60,4 @@ target/
 
 # Custom
 .env
-.cache
 *.html

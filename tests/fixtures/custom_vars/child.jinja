@@ -1,0 +1,8 @@
+{% extends 'base.jinja' %}
+{% block content %}
+{{ super() }}
+child content
+{{ triplicate('works! ') }}
+{{ number }} * 2 = {{ number * 2 }}
+{% endblock %}
+
