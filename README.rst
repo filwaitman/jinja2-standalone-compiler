@@ -25,4 +25,16 @@ Installation:
 
 Usage:
 -------------
-* TODO
+.. code:: bash
+
+    jinja2_standalone_compiler <path-to-jinja-files>  # Note that jinja files will be searched recursively
+
+For a more intense usage, you can also use a settings file to define a bunch of things. To use settings file:
+
+.. code:: bash
+
+    jinja2_standalone_compiler <path-to-jinja-files> --settings=path/to/settings.py
+
+Please note that settings file is a Python file, so Python syntax applies. =P
+
+In order to see what can be done with this settings file, please refer to `this example <https://github.com/filwaitman/jinja2-standalone-compiler/blob/master/settings_example.py>`_

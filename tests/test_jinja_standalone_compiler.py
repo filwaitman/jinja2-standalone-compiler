@@ -19,7 +19,7 @@ class MainTestCase(unittest.TestCase):
 
     def test_extends(self):
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'child_base', 'child.html')))
-        main(settings=None, path=os.path.join(fixtures_dir, 'child_base'))
+        main(os.path.join(fixtures_dir, 'child_base'))
         self.assertTrue(os.path.exists(os.path.join(fixtures_dir, 'child_base', 'child.html')))
 
         file_content = open(os.path.join(fixtures_dir, 'child_base', 'child.html')).read()
@@ -27,7 +27,7 @@ class MainTestCase(unittest.TestCase):
 
     def test_extends_and_include(self):
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'header_footer', 'child.html')))
-        main(settings=None, path=os.path.join(fixtures_dir, 'header_footer'))
+        main(os.path.join(fixtures_dir, 'header_footer'))
         self.assertTrue(os.path.exists(os.path.join(fixtures_dir, 'header_footer', 'child.html')))
 
         file_content = open(os.path.join(fixtures_dir, 'header_footer', 'child.html')).read()
@@ -38,7 +38,7 @@ class MainTestCase(unittest.TestCase):
         settings = Settings(EXTRA_VARIABLES={'number': 42, 'triplicate': lambda x: x * 3})
 
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'custom_vars', 'child.html')))
-        main(settings=settings, path=os.path.join(fixtures_dir, 'custom_vars'))
+        main(os.path.join(fixtures_dir, 'custom_vars'), settings=settings)
         self.assertTrue(os.path.exists(os.path.join(fixtures_dir, 'custom_vars', 'child.html')))
 
         file_content = open(os.path.join(fixtures_dir, 'custom_vars', 'child.html')).read()
@@ -51,7 +51,7 @@ class MainTestCase(unittest.TestCase):
 
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'header_footer', 'child.html')))
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'header_footer', 'base.html')))
-        main(settings=settings, path=os.path.join(fixtures_dir, 'header_footer'))
+        main(os.path.join(fixtures_dir, 'header_footer'), settings=settings)
         self.assertTrue(os.path.exists(os.path.join(fixtures_dir, 'header_footer', 'child.html')))
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'header_footer', 'base.html')))
 
@@ -60,9 +60,9 @@ class MainTestCase(unittest.TestCase):
         settings = Settings(EXTRA_VARIABLES={'name': 'Filipe Waitman'})
 
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'undefined_vars', 'child.html')))
-        self.assertRaises(UndefinedError, main, settings=None, path=os.path.join(fixtures_dir, 'undefined_vars'))
+        self.assertRaises(UndefinedError, main, path=os.path.join(fixtures_dir, 'undefined_vars'))
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'undefined_vars', 'child.html')))
 
         self.assertFalse(os.path.exists(os.path.join(fixtures_dir, 'undefined_vars', 'child.html')))
-        main(settings=settings, path=os.path.join(fixtures_dir, 'undefined_vars'))
+        main(os.path.join(fixtures_dir, 'undefined_vars'), settings=settings)
         self.assertTrue(os.path.exists(os.path.join(fixtures_dir, 'undefined_vars', 'child.html')))

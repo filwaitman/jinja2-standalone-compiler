@@ -19,7 +19,7 @@ def render_template(jinja_template, extra_variables):
     return template.render(extra_variables)
 
 
-def main(settings=None, path=None):
+def main(path, settings=None):
     extra_variables = {}
     ignore_jinja_templates = []
     if settings:
@@ -57,9 +57,9 @@ def main(settings=None, path=None):
 
 
 @click.command()
+@click.option('--path', help='Base path to jinja files (it is recursive.')
 @click.option('--settings', default=None, help='Settings file to use.')
-@click.option('--path', default=None, help='Base path to jinja files (it is recursive). Defaults to current dir.')
-def main_command(settings=None, path=None):
+def main_command(path, settings=None):
     current_dir = os.getcwd()
 
     if settings:
@@ -70,7 +70,5 @@ def main_command(settings=None, path=None):
         sys.path.insert(0, '')
         settings = imp.load_source(current_dir, settings)
 
-    if path:
-        current_dir = os.path.join(current_dir, path)
-
+    current_dir = os.path.join(current_dir, path)
     main(settings=settings, path=current_dir)
