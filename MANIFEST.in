@@ -1,3 +1,4 @@
 include *.txt
 include README.rst
 include tests/*
+include settings.py_EXAMPLE
