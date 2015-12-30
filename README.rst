@@ -1,5 +1,5 @@
 Jinja2 Standalone Compiler
-=============
+===========================
 
 This provides a silly way to create HTML templates based on Jinja2 ones without a framework.
 

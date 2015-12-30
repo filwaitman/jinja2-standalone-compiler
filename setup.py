@@ -12,7 +12,6 @@ setup(
     install_requires=[x.strip() for x in open('requirements.txt').readlines()],
     url='https://github.com/filwaitman/jinja2-standalone-compiler',
     download_url='https://github.com/filwaitman/jinja2-standalone-compiler/tarball/{}'.format(VERSION),
-    keywords=['cache', 'caching', 'memcached', 'redis'],
     test_suite='tests',
     classifiers=[
         "Development Status :: 1 - Planning",
