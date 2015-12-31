@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = '0.2.8'
+VERSION = '0.2.9'
 
 
 setup(
@@ -13,6 +13,7 @@ setup(
     url='https://github.com/filwaitman/jinja2-standalone-compiler',
     download_url='https://github.com/filwaitman/jinja2-standalone-compiler/tarball/{}'.format(VERSION),
     test_suite='tests',
+    keywords=['Jinja2', 'Jinja', 'renderer', 'compiler', 'HTML'],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
