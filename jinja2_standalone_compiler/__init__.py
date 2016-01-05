@@ -26,10 +26,13 @@ def main(path, settings=None):
         extra_variables = getattr(settings, 'EXTRA_VARIABLES', {})
         ignore_jinja_templates = getattr(settings, 'IGNORE_JINJA_TEMPLATES', [])
 
-    jinja_templates = []
-    for root, dirnames, filenames in os.walk(path):
-        for filename in fnmatch.filter(filenames, '*.jinja*'):
-            jinja_templates.append(os.path.join(root, filename))
+    if os.path.isdir(path):
+        jinja_templates = []
+        for root, dirnames, filenames in os.walk(path):
+            for filename in fnmatch.filter(filenames, '*.jinja*'):
+                jinja_templates.append(os.path.join(root, filename))
+    else:
+        jinja_templates = [path, ]  # path is just a file, actually
 
     for jinja_template in jinja_templates:
         skip = False
@@ -57,7 +60,7 @@ def main(path, settings=None):
 
 
 @click.command()
-@click.argument('path')
+@click.argument('path', type=click.Path(exists=True))
 @click.option('--settings', default=None, help='Settings file to use.')
 def main_command(path, settings=None):
     current_dir = os.getcwd()
