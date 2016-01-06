@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = '0.3'
+VERSION = '1.0'
 
 
 setup(
@@ -15,7 +15,7 @@ setup(
     test_suite='tests',
     keywords=['Jinja2', 'Jinja', 'renderer', 'compiler', 'HTML'],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
