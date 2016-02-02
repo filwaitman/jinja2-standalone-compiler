@@ -38,3 +38,12 @@ For a more intense usage, you can also use a settings file to define a bunch of 
 Please note that settings file is a Python file, so Python syntax applies. =P
 
 In order to see what can be done with this settings file, please refer to `this example <https://github.com/filwaitman/jinja2-standalone-compiler/blob/master/settings_example.py>`_
+
+
+Contribute
+----------
+Did you think in some interesting feature, or have you found a bug? Please let me know!
+Of course you can also download the project and send me some `pull requests <https://github.com/filwaitman/jinja2-standalone-compiler/pulls>`_.
+
+You can send your suggestions by `opening issues <https://github.com/filwaitman/jinja2-standalone-compiler/issues>`_.
+You can contact me directly as well. Take a look at my contact information at `http://filwaitman.github.io/ <http://filwaitman.github.io/>`_ (email is preferred rather than mobile phone).
