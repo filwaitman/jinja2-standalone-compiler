@@ -43,7 +43,10 @@ In order to see what can be done with this settings file, please refer to `this 
 Contribute
 ----------
 Did you think in some interesting feature, or have you found a bug? Please let me know!
+
 Of course you can also download the project and send me some `pull requests <https://github.com/filwaitman/jinja2-standalone-compiler/pulls>`_.
 
+
 You can send your suggestions by `opening issues <https://github.com/filwaitman/jinja2-standalone-compiler/issues>`_.
+
 You can contact me directly as well. Take a look at my contact information at `http://filwaitman.github.io/ <http://filwaitman.github.io/>`_ (email is preferred rather than mobile phone).
