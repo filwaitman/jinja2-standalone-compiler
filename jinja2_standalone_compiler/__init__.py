@@ -49,9 +49,9 @@ def main(path, settings=None):
             continue
 
         html_template, _ = os.path.splitext(jinja_template)
-        if output_options['remove_double_extension']:
+        if output_options.get('remove_double_extension', False):
             html_template, _ = os.path.splitext(html_template)
-        html_template = '{}{}'.format(html_template, output_options['extension'])
+        html_template = '{}{}'.format(html_template, output_options.get('extension', '.html'))
 
         print 'CREATING:', html_template
         try:
