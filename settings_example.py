@@ -15,3 +15,8 @@ EXTRA_VARIABLES = {
     'debug': False,
     'triplicate': lambda x: x * 3
 }
+
+OUTPUT_OPTIONS = {
+    'extension': '.html', # Including leading '.'
+    'remove_double_extension': False # If you use something like sample.jinja.html
+}

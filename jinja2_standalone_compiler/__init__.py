@@ -9,9 +9,10 @@ import click
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 
-def render_template(jinja_template, extra_variables):
-    print '    BASE TEMPLATE:', jinja_template
-    print '    EXTRA VARS   :', extra_variables
+def render_template(jinja_template, extra_variables, output_options):
+    print '    BASE TEMPLATE :', jinja_template
+    print '    EXTRA VARS    :', extra_variables
+    print '    OUTPUT OPTIONS:', output_options
 
     environment = Environment(loader=FileSystemLoader([os.path.dirname(jinja_template)]), trim_blocks=True, lstrip_blocks=True)
     environment.undefined = StrictUndefined
@@ -22,9 +23,11 @@ def render_template(jinja_template, extra_variables):
 def main(path, settings=None):
     extra_variables = {}
     ignore_jinja_templates = []
+    output_options = {}
     if settings:
         extra_variables = getattr(settings, 'EXTRA_VARIABLES', {})
         ignore_jinja_templates = getattr(settings, 'IGNORE_JINJA_TEMPLATES', [])
+        output_options = getattr(settings, 'OUTPUT_OPTIONS', {})
 
     if os.path.isdir(path):
         jinja_templates = []
@@ -46,12 +49,14 @@ def main(path, settings=None):
             continue
 
         html_template, _ = os.path.splitext(jinja_template)
-        html_template = '{}.html'.format(html_template)
+        if output_options.get('remove_double_extension', False):
+            html_template, _ = os.path.splitext(html_template)
+        html_template = '{}{}'.format(html_template, output_options.get('extension', '.html'))
 
         print 'CREATING:', html_template
         try:
             with open(html_template, 'w') as f:
-                f.write(render_template(jinja_template, extra_variables=extra_variables).encode('utf-8'))
+                f.write(render_template(jinja_template, extra_variables=extra_variables, output_options=output_options).encode('utf-8'))
         except:
             os.unlink(html_template)
             raise
