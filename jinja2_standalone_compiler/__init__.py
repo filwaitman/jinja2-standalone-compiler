@@ -7,14 +7,31 @@ import sys
 
 import click
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
+from jinja2.defaults import BLOCK_START_STRING, \
+     BLOCK_END_STRING, VARIABLE_START_STRING, VARIABLE_END_STRING, \
+     COMMENT_START_STRING, COMMENT_END_STRING, LINE_STATEMENT_PREFIX, \
+     LINE_COMMENT_PREFIX, NEWLINE_SEQUENCE, KEEP_TRAILING_NEWLINE
 
 
-def render_template(jinja_template, extra_variables, output_options):
-    print '    BASE TEMPLATE :', jinja_template
-    print '    EXTRA VARS    :', extra_variables
-    print '    OUTPUT OPTIONS:', output_options
+def render_template(jinja_template, extra_variables, output_options, jinja_environment):
+    print '    BASE TEMPLATE    :', jinja_template
+    print '    EXTRA VARS       :', extra_variables
+    print '    OUTPUT OPTIONS   :', output_options
+    print '    JINJA ENVIRONMENT:', jinja_environment
 
-    environment = Environment(loader=FileSystemLoader([os.path.dirname(jinja_template)]), trim_blocks=True, lstrip_blocks=True)
+    environment = Environment(loader=FileSystemLoader([os.path.dirname(jinja_template)]),
+                              block_start_string = jinja_environment.get('BLOCK_START_STRING', BLOCK_START_STRING),
+                              block_end_string = jinja_environment.get('BLOCK_END_STRING', BLOCK_END_STRING),
+                              variable_start_string = jinja_environment.get('VARIABLE_START_STRING', VARIABLE_START_STRING),
+                              variable_end_string = jinja_environment.get('VARIABLE_END_STRING', VARIABLE_END_STRING),
+                              comment_start_string = jinja_environment.get('COMMENT_START_STRING', COMMENT_START_STRING),
+                              comment_end_string = jinja_environment.get('COMMENT_END_STRING', COMMENT_END_STRING),
+                              line_statement_prefix = jinja_environment.get('LINE_STATEMENT_PREFIX', LINE_STATEMENT_PREFIX),
+                              line_comment_prefix = jinja_environment.get('LINE_COMMENT_PREFIX', LINE_COMMENT_PREFIX),
+                              trim_blocks = jinja_environment.get('TRIM_BLOCKS', True),
+                              lstrip_blocks = jinja_environment.get('LSTRIP_BLOCKS', True),
+                              newline_sequence = jinja_environment.get('NEWLINE_SEQUENCE', NEWLINE_SEQUENCE),
+                              keep_trailing_newline = jinja_environment.get('KEEP_TRAILING_NEWLINE', KEEP_TRAILING_NEWLINE))
     environment.undefined = StrictUndefined
     template = environment.get_template(os.path.basename(jinja_template))
     return template.render(extra_variables)
@@ -24,10 +41,12 @@ def main(path, settings=None):
     extra_variables = {}
     ignore_jinja_templates = []
     output_options = {}
+    jinja_environment = {}
     if settings:
         extra_variables = getattr(settings, 'EXTRA_VARIABLES', {})
         ignore_jinja_templates = getattr(settings, 'IGNORE_JINJA_TEMPLATES', [])
         output_options = getattr(settings, 'OUTPUT_OPTIONS', {})
+        jinja_environment = getattr(settings, 'JINJA_ENVIRONMENT', {})
 
     if os.path.isdir(path):
         jinja_templates = []
@@ -56,7 +75,7 @@ def main(path, settings=None):
         print 'CREATING:', html_template
         try:
             with open(html_template, 'w') as f:
-                f.write(render_template(jinja_template, extra_variables=extra_variables, output_options=output_options).encode('utf-8'))
+                f.write(render_template(jinja_template, extra_variables=extra_variables, output_options=output_options, jinja_environment=jinja_environment).encode('utf-8'))
         except:
             os.unlink(html_template)
             raise
