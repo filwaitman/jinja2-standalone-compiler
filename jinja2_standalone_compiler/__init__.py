@@ -129,7 +129,7 @@ def main(path, settings=None, out_path=None, verbose=False, silent=False):
 @click.option('--settings', default=None, help='Settings file to use.')
 @click.option('--out', type=click.Path(exists=False, file_okay=False, dir_okay=True), default=None, help='Output path to use.')
 @click.option('--verbose', is_flag=True, default=False, help='Detailed command line output')
-@click.option('--silent', is_flag=True, default=False, help='Surpress command line output')
+@click.option('--silent', is_flag=True, default=False, help='Suppress command line output')
 def main_command(path, settings=None, out=None, verbose=False, silent=False):
     current_dir = os.getcwd()
 
