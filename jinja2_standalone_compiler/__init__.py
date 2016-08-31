@@ -92,7 +92,7 @@ def main(path, settings=None, out_path=None, verbose=False, silent=False):
                 except:
                     raise IOError(
                         u'Cannot create sub ouput directory: {}'.format(template_dir))
-
+            template_file, _ = os.path.splitext(template_file)
         else:
             template_file, _ = os.path.splitext(jinja_template)
 
