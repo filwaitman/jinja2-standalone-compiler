@@ -139,7 +139,7 @@ def main_command(path, settings=None, out=None, verbose=False, silent=False):
 
     if settings:
         if not silent:
-            print_log('{}Number of specified setting files: {}'.format(Fore.GREEN, len(settings)))
+            print_log('{}Number of specified settings files: {}'.format(Fore.GREEN, len(settings)))
         for setting in settings:
             settings_file = os.path.normpath(os.path.join(current_dir, setting))
             if not os.path.exists(settings_file):
