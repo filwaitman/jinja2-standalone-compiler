@@ -7,20 +7,20 @@ IGNORE_JINJA_TEMPLATES = [
     '.*tests/.*'
 ]
 
-#Here you can override the default jinja environment setup
+# Here you can override the default jinja environment setup
 JINJA_ENVIRONMENT = {
-#    'BLOCK_START_STRING': '{%',
-#    'BLOCK_END_STRING': '%}',
-#    'VARIABLE_START_STRING': '{{',
-#    'VARIABLE_END_STRING': '}}',
-#    'COMMENT_START_STRING': '{#',
-#    'COMMENT_END_STRING': '#}',
-#    'LINE_STATEMENT_PREFIX': None,
-#    'LINE_COMMENT_PREFIX': None,
-#    'TRIM_BLOCKS': True, # Jinja default is False
-#    'LSTRIP_BLOCKS': True, #Jinja default is False
-#    'NEWLINE_SEQUENCE': '\n',
-#    'KEEP_TRAILING_NEWLINE': False
+   # 'BLOCK_START_STRING': '{%',
+   # 'BLOCK_END_STRING': '%}',
+   # 'VARIABLE_START_STRING': '{{',
+   # 'VARIABLE_END_STRING': '}}',
+   # 'COMMENT_START_STRING': '{#',
+   # 'COMMENT_END_STRING': '#}',
+   # 'LINE_STATEMENT_PREFIX': None,
+   # 'LINE_COMMENT_PREFIX': None,
+   # 'TRIM_BLOCKS': True, # Jinja default is False
+   # 'LSTRIP_BLOCKS': True, #Jinja default is False
+   # 'NEWLINE_SEQUENCE': '\n',
+   # 'KEEP_TRAILING_NEWLINE': False
 }
 
 # Do you have any additional variables to the templates? Put 'em here! (use dictionary ('key': value) format)
@@ -32,6 +32,6 @@ EXTRA_VARIABLES = {
 }
 
 OUTPUT_OPTIONS = {
-    'extension': '.html', # Including leading '.'
-    'remove_double_extension': False # If you use something like sample.jinja.html
+    'extension': '.html',  # Including leading '.'
+    'remove_double_extension': False  # If you use something like sample.jinja.html
 }
