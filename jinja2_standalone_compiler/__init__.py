@@ -5,7 +5,8 @@ import os
 import re
 import sys
 import click
-from colorama import init, Fore, Style
+import platform
+
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from jinja2.defaults import (
     BLOCK_START_STRING, BLOCK_END_STRING, VARIABLE_START_STRING, VARIABLE_END_STRING, COMMENT_START_STRING,
@@ -15,6 +16,12 @@ from jinja2.defaults import (
 # Globals
 global_silent = False
 global_verbose = False
+style_JINJA_FILE = ''
+style_WARNING = ''
+style_SETTING = ''
+style_RENDERED_FILE = ''
+style_SUCCESS = ''
+style_ALL_DONE = ''
 
 
 def print_log(msg, verbose_msg=False):
@@ -55,7 +62,7 @@ def main(path, out_path=None, settings=None):
         jinja_environment = getattr(settings, 'JINJA_ENVIRONMENT', {})
 
     if os.path.isdir(path):
-        print_log('  Looking for jinja templates in: {}{}'.format(Fore.MAGENTA, path))
+        print_log('  Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path))
         jinja_templates = []
         for root, dirnames, filenames in os.walk(path):
             for filename in fnmatch.filter(filenames, '*.jinja*'):
@@ -63,15 +70,15 @@ def main(path, out_path=None, settings=None):
     else:
         jinja_templates = [path, ]  # path is just a file, actually
 
-    print_log('  Jinja files found: {}{}'.format(Fore.MAGENTA, len(jinja_templates)))
+    print_log('  Jinja files found: {}{}'.format(style_JINJA_FILE, len(jinja_templates)))
 
     for jinja_template in jinja_templates:
-        print_log('   Processing:' + Fore.MAGENTA + jinja_template)
+        print_log('   Processing:' + style_JINJA_FILE + jinja_template)
 
         skip = False
         for jinja_template_to_be_ignored in ignore_jinja_templates:
             if re.match(jinja_template_to_be_ignored, jinja_template):
-                print_log('    Skipping: ' + Fore.YELLOW + Style.BRIGHT + jinja_template)
+                print_log('    Skipping: ' + style_WARNING + jinja_template)
                 skip = True
                 break
 
@@ -80,7 +87,10 @@ def main(path, out_path=None, settings=None):
 
         if out_path:
             rel_path = os.path.relpath(jinja_template, path)
+            if rel_path=='.':
+                rel_path = os.path.basename(path)
             template_file = os.path.join(out_path, rel_path)
+
             template_dir = os.path.dirname(template_file)
             if not os.path.exists(template_dir):
                 try:
@@ -99,7 +109,7 @@ def main(path, out_path=None, settings=None):
 
         template_file = '{}{}'.format(template_file, output_options.get('extension', '.html'))
 
-        print_log('    Creating: ' + Fore.CYAN + template_file)
+        print_log('    Creating: ' + style_RENDERED_FILE + template_file)
 
         try:
             with open(template_file, 'w') as f:
@@ -124,11 +134,33 @@ def main(path, out_path=None, settings=None):
 @click.option('--verbose', is_flag=True, default=False, help='Detailed command line output')
 @click.option('--silent', is_flag=True, default=False, help='Suppress command line output')
 def main_command(path, settings=None, out=None, verbose=False, silent=False):
-    init(autoreset=True)  # Init colorama
-    current_dir = os.getcwd()
-
+    global global_silent
+    global global_verbose
     global_silent = silent
     global_verbose = verbose
+    
+	# Optionally initialize colorama for better text output overview
+    try:
+        from colorama import init, Fore, Style
+        init(autoreset=True)
+        
+        global style_JINJA_FILE
+        global style_WARNING
+        global style_SETTING
+        global style_RENDERED_FILE
+        global style_SUCCESS
+        global style_ALL_DONE
+        
+        style_JINJA_FILE = Fore.MAGENTA
+        style_WARNING = Fore.YELLOW + Style.BRIGHT
+        style_SETTING = Fore.CYAN
+        style_RENDERED_FILE = Fore.CYAN
+        style_SUCCESS = Fore.GREEN
+        style_ALL_DONE = Fore.GREEN + Style.BRIGHT
+    except:
+        print_log('<optional dependency \'colorama\' not found, try \'pip install colorama==0.3.7\' to see colored output>')
+
+    current_dir = os.getcwd()
 
     if out and not os.path.exists(out):
         out = os.path.normpath(out)
@@ -139,24 +171,24 @@ def main_command(path, settings=None, out=None, verbose=False, silent=False):
 
     if settings:
         if not silent:
-            print_log('{}Number of specified settings files: {}'.format(Fore.GREEN, len(settings)))
+            print_log('{}Number of specified settings files: {}'.format(style_SUCCESS, len(settings)))
         for setting in settings:
             settings_file = os.path.normpath(os.path.join(current_dir, setting))
             if not os.path.exists(settings_file):
                 raise IOError(u'Settings file not found: {}'.format(settings_file))
             else:
                 if not silent:
-                    print_log(' Using settings file: ' + Fore.CYAN + settings_file)
+                    print_log(' Using settings file: ' + style_SETTING + settings_file)
             sys.path.insert(0, '')
             setting = imp.load_source(current_dir, setting)
             work_dir = os.path.normpath(os.path.join(current_dir, path))
 
             main(work_dir, out, setting)
 
-            print_log(Fore.GREEN + ' Done.')
+            print_log(style_SUCCESS + ' Done.')
     else:
         work_dir = os.path.join(current_dir, path)
 
         main(work_dir, out)
 
-    print_log(Fore.GREEN + Style.BRIGHT + 'All done.')
+    print_log(style_ALL_DONE + 'All done.')
