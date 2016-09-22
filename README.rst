@@ -35,8 +35,9 @@ Usage:
 
         jinja2_standalone_compiler <path-to-jinja-files> --settings=path/to/settings.py
 
-
+  * You can also use -s instead of --settings
   * Please note that settings file is a Python file, so Python syntax applies. =P
+  * It's also possible to use multiple settings files, so that a template will be rendered multiple times with a different setup: -s <settings-1> -s <settings-2> ...
   * In order to see what can be done with this settings file, please refer to `this example <https://github.com/filwaitman/jinja2-standalone-compiler/blob/master/settings_example.py>`_
 
 * To turn off console ouput you can use the following option:
@@ -57,7 +58,8 @@ Usage:
 
         jinja2_standalone_compiler <path-to-jinja-files> --out=<path-to-output-dir>
 
-
+  * You can also use -o instead of --out
+  
 Contribute
 ----------
 Did you think in some interesting feature, or have you found a bug? Please let me know!

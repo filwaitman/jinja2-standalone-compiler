@@ -1,2 +1,2 @@
 click==6.2
-Jinja2>=2.8
+Jinja2==2.8
