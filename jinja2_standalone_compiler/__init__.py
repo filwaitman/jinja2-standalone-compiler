@@ -4,53 +4,59 @@ import imp
 import os
 import re
 import sys
+
 import click
-import platform
-
-from jinja2 import Environment, FileSystemLoader, StrictUndefined
-from jinja2.defaults import (
-    BLOCK_START_STRING, BLOCK_END_STRING, VARIABLE_START_STRING, VARIABLE_END_STRING, COMMENT_START_STRING,
-    COMMENT_END_STRING, LINE_STATEMENT_PREFIX, LINE_COMMENT_PREFIX, NEWLINE_SEQUENCE, KEEP_TRAILING_NEWLINE
-)
-
-# Globals
-global_silent = False
-global_verbose = False
-style_JINJA_FILE = ''
-style_WARNING = ''
-style_SETTING = ''
-style_RENDERED_FILE = ''
-style_SUCCESS = ''
-style_ALL_DONE = ''
+from jinja2 import Environment, FileSystemLoader, StrictUndefined, defaults
 
 
-def print_log(msg, verbose_msg=False):
-    if not global_silent and ((verbose_msg and global_verbose) or not verbose_msg):
+try:
+    from colorama import init, Fore, Style
+    init(autoreset=True)
+
+    style_JINJA_FILE = Fore.MAGENTA
+    style_WARNING = Fore.YELLOW + Style.BRIGHT
+    style_SETTING = Fore.CYAN
+    style_RENDERED_FILE = Fore.CYAN
+    style_SUCCESS = Fore.GREEN
+    style_ALL_DONE = Fore.GREEN + Style.BRIGHT
+except:
+    print "<optional dependency 'colorama' not found, try 'pip install colorama==0.3.7' to see colored output>"
+
+    style_JINJA_FILE = ''
+    style_WARNING = ''
+    style_SETTING = ''
+    style_RENDERED_FILE = ''
+    style_SUCCESS = ''
+    style_ALL_DONE = ''
+
+
+def print_log(msg, verbose_msg=False, verbose=False, silent=False):
+    if not silent and ((verbose_msg and verbose) or not verbose_msg):
         print msg
 
 
 def render_template(jinja_template, extra_variables, output_options, jinja_environment):
     environment = Environment(
         loader=FileSystemLoader([os.path.dirname(jinja_template)]),
-        block_start_string=jinja_environment.get('BLOCK_START_STRING', BLOCK_START_STRING),
-        block_end_string=jinja_environment.get('BLOCK_END_STRING', BLOCK_END_STRING),
-        variable_start_string=jinja_environment.get('VARIABLE_START_STRING', VARIABLE_START_STRING),
-        variable_end_string=jinja_environment.get('VARIABLE_END_STRING', VARIABLE_END_STRING),
-        comment_start_string=jinja_environment.get('COMMENT_START_STRING', COMMENT_START_STRING),
-        comment_end_string=jinja_environment.get('COMMENT_END_STRING', COMMENT_END_STRING),
-        line_statement_prefix=jinja_environment.get('LINE_STATEMENT_PREFIX', LINE_STATEMENT_PREFIX),
-        line_comment_prefix=jinja_environment.get('LINE_COMMENT_PREFIX', LINE_COMMENT_PREFIX),
+        block_start_string=jinja_environment.get('BLOCK_START_STRING', defaults.BLOCK_START_STRING),
+        block_end_string=jinja_environment.get('BLOCK_END_STRING', defaults.BLOCK_END_STRING),
+        variable_start_string=jinja_environment.get('VARIABLE_START_STRING', defaults.VARIABLE_START_STRING),
+        variable_end_string=jinja_environment.get('VARIABLE_END_STRING', defaults.VARIABLE_END_STRING),
+        comment_start_string=jinja_environment.get('COMMENT_START_STRING', defaults.COMMENT_START_STRING),
+        comment_end_string=jinja_environment.get('COMMENT_END_STRING', defaults.COMMENT_END_STRING),
+        line_statement_prefix=jinja_environment.get('LINE_STATEMENT_PREFIX', defaults.LINE_STATEMENT_PREFIX),
+        line_comment_prefix=jinja_environment.get('LINE_COMMENT_PREFIX', defaults.LINE_COMMENT_PREFIX),
         trim_blocks=jinja_environment.get('TRIM_BLOCKS', True),
         lstrip_blocks=jinja_environment.get('LSTRIP_BLOCKS', True),
-        newline_sequence=jinja_environment.get('NEWLINE_SEQUENCE', NEWLINE_SEQUENCE),
-        keep_trailing_newline=jinja_environment.get('KEEP_TRAILING_NEWLINE', KEEP_TRAILING_NEWLINE)
+        newline_sequence=jinja_environment.get('NEWLINE_SEQUENCE', defaults.NEWLINE_SEQUENCE),
+        keep_trailing_newline=jinja_environment.get('KEEP_TRAILING_NEWLINE', defaults.KEEP_TRAILING_NEWLINE)
     )
     environment.undefined = StrictUndefined
     template = environment.get_template(os.path.basename(jinja_template))
     return template.render(extra_variables)
 
 
-def main(path, out_path=None, settings=None):
+def main(path, out_path=None, verbose=False, silent=False, settings=None):
     extra_variables = {}
     ignore_jinja_templates = []
     output_options = {}
@@ -62,7 +68,7 @@ def main(path, out_path=None, settings=None):
         jinja_environment = getattr(settings, 'JINJA_ENVIRONMENT', {})
 
     if os.path.isdir(path):
-        print_log('  Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path))
+        print_log('  Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path), verbose, silent)
         jinja_templates = []
         for root, dirnames, filenames in os.walk(path):
             for filename in fnmatch.filter(filenames, '*.jinja*'):
@@ -70,15 +76,15 @@ def main(path, out_path=None, settings=None):
     else:
         jinja_templates = [path, ]  # path is just a file, actually
 
-    print_log('  Jinja files found: {}{}'.format(style_JINJA_FILE, len(jinja_templates)))
+    print_log('  Jinja files found: {}{}'.format(style_JINJA_FILE, len(jinja_templates)), verbose, silent)
 
     for jinja_template in jinja_templates:
-        print_log('   Processing:' + style_JINJA_FILE + jinja_template)
+        print_log('   Processing:' + style_JINJA_FILE + jinja_template, verbose, silent)
 
         skip = False
         for jinja_template_to_be_ignored in ignore_jinja_templates:
             if re.match(jinja_template_to_be_ignored, jinja_template):
-                print_log('    Skipping: ' + style_WARNING + jinja_template)
+                print_log('    Skipping: ' + style_WARNING + jinja_template, verbose, silent)
                 skip = True
                 break
 
@@ -87,7 +93,7 @@ def main(path, out_path=None, settings=None):
 
         if out_path:
             rel_path = os.path.relpath(jinja_template, path)
-            if rel_path=='.':
+            if rel_path == '.':
                 rel_path = os.path.basename(path)
             template_file = os.path.join(out_path, rel_path)
 
@@ -109,13 +115,13 @@ def main(path, out_path=None, settings=None):
 
         template_file = '{}{}'.format(template_file, output_options.get('extension', '.html'))
 
-        print_log('    Creating: ' + style_RENDERED_FILE + template_file)
+        print_log('    Creating: ' + style_RENDERED_FILE + template_file, verbose, silent)
 
         try:
             with open(template_file, 'w') as f:
-                print_log('     EXTRA_VARIABLES  : {}'.format(extra_variables), True)
-                print_log('     OUTPUT_OPTIONS   : {}'.format(output_options), True)
-                print_log('     JINJA_ENVIRONMENT: {}'.format(jinja_environment), True)
+                print_log('     EXTRA_VARIABLES  : {}'.format(extra_variables), True, verbose, silent)
+                print_log('     OUTPUT_OPTIONS   : {}'.format(output_options), True, verbose, silent)
+                print_log('     JINJA_ENVIRONMENT: {}'.format(jinja_environment), True, verbose, silent)
                 f.write(render_template(
                     jinja_template,
                     extra_variables=extra_variables,
@@ -130,36 +136,11 @@ def main(path, out_path=None, settings=None):
 @click.command()
 @click.argument('path', type=click.Path(exists=True))
 @click.option('--settings', '-s', default=None, multiple=True, help='Settings file to use.')
-@click.option('--out', '-o', type=click.Path(exists=False, file_okay=False, dir_okay=True), default=None, help='Output path to use.')
+@click.option('--out', '-o', type=click.Path(exists=False, file_okay=False, dir_okay=True),
+              default=None, help='Output path to use.')
 @click.option('--verbose', is_flag=True, default=False, help='Detailed command line output')
 @click.option('--silent', is_flag=True, default=False, help='Suppress command line output')
 def main_command(path, settings=None, out=None, verbose=False, silent=False):
-    global global_silent
-    global global_verbose
-    global_silent = silent
-    global_verbose = verbose
-    
-	# Optionally initialize colorama for better text output overview
-    try:
-        from colorama import init, Fore, Style
-        init(autoreset=True)
-        
-        global style_JINJA_FILE
-        global style_WARNING
-        global style_SETTING
-        global style_RENDERED_FILE
-        global style_SUCCESS
-        global style_ALL_DONE
-        
-        style_JINJA_FILE = Fore.MAGENTA
-        style_WARNING = Fore.YELLOW + Style.BRIGHT
-        style_SETTING = Fore.CYAN
-        style_RENDERED_FILE = Fore.CYAN
-        style_SUCCESS = Fore.GREEN
-        style_ALL_DONE = Fore.GREEN + Style.BRIGHT
-    except:
-        print_log('<optional dependency \'colorama\' not found, try \'pip install colorama==0.3.7\' to see colored output>')
-
     current_dir = os.getcwd()
 
     if out and not os.path.exists(out):
@@ -171,24 +152,24 @@ def main_command(path, settings=None, out=None, verbose=False, silent=False):
 
     if settings:
         if not silent:
-            print_log('{}Number of specified settings files: {}'.format(style_SUCCESS, len(settings)))
+            print_log('{}Number of specified settings files: {}'.format(style_SUCCESS, len(settings)), verbose, silent)
         for setting in settings:
             settings_file = os.path.normpath(os.path.join(current_dir, setting))
             if not os.path.exists(settings_file):
                 raise IOError(u'Settings file not found: {}'.format(settings_file))
             else:
                 if not silent:
-                    print_log(' Using settings file: ' + style_SETTING + settings_file)
+                    print_log(' Using settings file: ' + style_SETTING + settings_file, verbose, silent)
             sys.path.insert(0, '')
             setting = imp.load_source(current_dir, setting)
             work_dir = os.path.normpath(os.path.join(current_dir, path))
 
-            main(work_dir, out, setting)
+            main(work_dir, out, verbose, silent, setting)
 
-            print_log(style_SUCCESS + ' Done.')
+            print_log(style_SUCCESS + ' Done.', verbose, silent)
     else:
         work_dir = os.path.join(current_dir, path)
 
-        main(work_dir, out)
+        main(work_dir, out, verbose, silent)
 
-    print_log(style_ALL_DONE + 'All done.')
+    print_log(style_ALL_DONE + 'All done.', verbose, silent)
