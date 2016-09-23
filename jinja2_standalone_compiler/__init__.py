@@ -31,8 +31,13 @@ except:
 
 
 def print_log(msg, verbose_msg=False, verbose=False, silent=False):
-    if not silent and ((verbose_msg and verbose) or not verbose_msg):
-        print msg
+    if silent:
+        return
+
+    if not verbose and verbose_msg:
+        return
+
+    print msg
 
 
 def render_template(jinja_template, extra_variables, output_options, jinja_environment):
@@ -68,7 +73,7 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
         jinja_environment = getattr(settings, 'JINJA_ENVIRONMENT', {})
 
     if os.path.isdir(path):
-        print_log('  Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path), verbose, silent)
+        print_log('  Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path), False, verbose, silent)
         jinja_templates = []
         for root, dirnames, filenames in os.walk(path):
             for filename in fnmatch.filter(filenames, '*.jinja*'):
@@ -76,15 +81,15 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
     else:
         jinja_templates = [path, ]  # path is just a file, actually
 
-    print_log('  Jinja files found: {}{}'.format(style_JINJA_FILE, len(jinja_templates)), verbose, silent)
+    print_log('  Jinja files found: {}{}'.format(style_JINJA_FILE, len(jinja_templates)), False, verbose, silent)
 
     for jinja_template in jinja_templates:
-        print_log('   Processing:' + style_JINJA_FILE + jinja_template, verbose, silent)
+        print_log('   Processing:' + style_JINJA_FILE + jinja_template, False, verbose, silent)
 
         skip = False
         for jinja_template_to_be_ignored in ignore_jinja_templates:
             if re.match(jinja_template_to_be_ignored, jinja_template):
-                print_log('    Skipping: ' + style_WARNING + jinja_template, verbose, silent)
+                print_log('    Skipping: ' + style_WARNING + jinja_template, False, verbose, silent)
                 skip = True
                 break
 
@@ -115,7 +120,7 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
 
         template_file = '{}{}'.format(template_file, output_options.get('extension', '.html'))
 
-        print_log('    Creating: ' + style_RENDERED_FILE + template_file, verbose, silent)
+        print_log('    Creating: ' + style_RENDERED_FILE + template_file, False, verbose, silent)
 
         try:
             with open(template_file, 'w') as f:
@@ -152,24 +157,27 @@ def main_command(path, settings=None, out=None, verbose=False, silent=False):
 
     if settings:
         if not silent:
-            print_log('{}Number of specified settings files: {}'.format(style_SUCCESS, len(settings)), verbose, silent)
+            print_log(
+                '{}Number of specified settings files: {}'.format(style_SUCCESS, len(settings)), False, verbose, silent
+            )
+
         for setting in settings:
             settings_file = os.path.normpath(os.path.join(current_dir, setting))
             if not os.path.exists(settings_file):
                 raise IOError(u'Settings file not found: {}'.format(settings_file))
             else:
                 if not silent:
-                    print_log(' Using settings file: ' + style_SETTING + settings_file, verbose, silent)
+                    print_log(' Using settings file: ' + style_SETTING + settings_file, False, verbose, silent)
             sys.path.insert(0, '')
             setting = imp.load_source(current_dir, setting)
             work_dir = os.path.normpath(os.path.join(current_dir, path))
 
             main(work_dir, out, verbose, silent, setting)
 
-            print_log(style_SUCCESS + ' Done.', verbose, silent)
+            print_log(style_SUCCESS + ' Done.', False, verbose, silent)
     else:
         work_dir = os.path.join(current_dir, path)
 
         main(work_dir, out, verbose, silent)
 
-    print_log(style_ALL_DONE + 'All done.', verbose, silent)
+    print_log(style_ALL_DONE + 'All done.', False, verbose, silent)
