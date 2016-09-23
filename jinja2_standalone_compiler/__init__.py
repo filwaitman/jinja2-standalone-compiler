@@ -12,6 +12,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined, defaults
 try:
     from colorama import init, Fore, Style
     init(autoreset=True)
+    using_colorama = True
 
     style_JINJA_FILE = Fore.MAGENTA
     style_WARNING = Fore.YELLOW + Style.BRIGHT
@@ -19,8 +20,9 @@ try:
     style_RENDERED_FILE = Fore.CYAN
     style_SUCCESS = Fore.GREEN
     style_ALL_DONE = Fore.GREEN + Style.BRIGHT
+
 except:
-    print "<optional dependency 'colorama' not found, try 'pip install colorama==0.3.7' to see colored output>"
+    using_colorama = False
 
     style_JINJA_FILE = ''
     style_WARNING = ''
@@ -72,8 +74,13 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
         output_options = getattr(settings, 'OUTPUT_OPTIONS', {})
         jinja_environment = getattr(settings, 'JINJA_ENVIRONMENT', {})
 
+    print_log('Additional context and options:', True, verbose, silent)
+    print_log('  EXTRA_VARIABLES  : {}'.format(extra_variables), True, verbose, silent)
+    print_log('  OUTPUT_OPTIONS   : {}'.format(output_options), True, verbose, silent)
+    print_log('  JINJA_ENVIRONMENT: {}'.format(jinja_environment), True, verbose, silent)
+
     if os.path.isdir(path):
-        print_log('  Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path), False, verbose, silent)
+        print_log('Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path), False, verbose, silent)
         jinja_templates = []
         for root, dirnames, filenames in os.walk(path):
             for filename in fnmatch.filter(filenames, '*.jinja*'):
@@ -84,12 +91,12 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
     print_log('  Jinja files found: {}{}'.format(style_JINJA_FILE, len(jinja_templates)), False, verbose, silent)
 
     for jinja_template in jinja_templates:
-        print_log('   Processing:' + style_JINJA_FILE + jinja_template, False, verbose, silent)
+        print_log('Processing:' + style_JINJA_FILE + jinja_template, False, verbose, silent)
 
         skip = False
         for jinja_template_to_be_ignored in ignore_jinja_templates:
             if re.match(jinja_template_to_be_ignored, jinja_template):
-                print_log('    Skipping: ' + style_WARNING + jinja_template, False, verbose, silent)
+                print_log('  Skipping: ' + style_WARNING + jinja_template, False, verbose, silent)
                 skip = True
                 break
 
@@ -107,7 +114,7 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
                 try:
                     os.makedirs(template_dir)
                 except:
-                    raise IOError(u'Cannot create sub output directory: {}'.format(template_dir))
+                    raise IOError('Cannot create sub output directory: {}'.format(template_dir))
 
             template_file, _ = os.path.splitext(template_file)
         else:
@@ -120,13 +127,10 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
 
         template_file = '{}{}'.format(template_file, output_options.get('extension', '.html'))
 
-        print_log('    Creating: ' + style_RENDERED_FILE + template_file, False, verbose, silent)
+        print_log('  Creating: ' + style_RENDERED_FILE + template_file, False, verbose, silent)
 
         try:
             with open(template_file, 'w') as f:
-                print_log('     EXTRA_VARIABLES  : {}'.format(extra_variables), True, verbose, silent)
-                print_log('     OUTPUT_OPTIONS   : {}'.format(output_options), True, verbose, silent)
-                print_log('     JINJA_ENVIRONMENT: {}'.format(jinja_environment), True, verbose, silent)
                 f.write(render_template(
                     jinja_template,
                     extra_variables=extra_variables,
@@ -148,33 +152,36 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
 def main_command(path, settings=None, out=None, verbose=False, silent=False):
     current_dir = os.getcwd()
 
+    if not using_colorama and not silent:
+        print "<optional dependency 'colorama' not found, try 'pip install colorama==0.3.7' to see colored output>"
+
     if out and not os.path.exists(out):
         out = os.path.normpath(out)
         try:
             os.makedirs(out)
         except:
-            raise IOError(u'Cannot create output directory: {}'.format(out))
+            raise IOError('Cannot create output directory: {}'.format(out))
 
     if settings:
         if not silent:
-            print_log(
-                '{}Number of specified settings files: {}'.format(style_SUCCESS, len(settings)), False, verbose, silent
-            )
+            print_log('{}Number of settings files: {}'.format(style_SUCCESS, len(settings)), False, verbose, silent)
 
         for setting in settings:
             settings_file = os.path.normpath(os.path.join(current_dir, setting))
             if not os.path.exists(settings_file):
-                raise IOError(u'Settings file not found: {}'.format(settings_file))
+                raise IOError('Settings file not found: {}'.format(settings_file))
             else:
                 if not silent:
-                    print_log(' Using settings file: ' + style_SETTING + settings_file, False, verbose, silent)
+                    print_log('Using settings file: ' + style_SETTING + settings_file, False, verbose, silent)
+
             sys.path.insert(0, '')
             setting = imp.load_source(current_dir, setting)
             work_dir = os.path.normpath(os.path.join(current_dir, path))
 
             main(work_dir, out, verbose, silent, setting)
 
-            print_log(style_SUCCESS + ' Done.', False, verbose, silent)
+            print_log(style_SUCCESS + 'Done.', False, verbose, silent)
+
     else:
         work_dir = os.path.join(current_dir, path)
 
