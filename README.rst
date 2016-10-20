@@ -7,6 +7,8 @@ This aims to be stupidly simple - in order to be used to whom have never heard a
 
 The least you should do to work with this is learn a bit of `Jinja2 <http://jinja.pocoo.org/>`_. Do it now, you won't regret. =)
 
+Ah! This project works well on both Python2 and Python3.
+
 This is:
 -------------
 * a way to use Jinja2 outside python frameworks.
@@ -59,7 +61,7 @@ Usage:
         jinja2_standalone_compiler <path-to-jinja-files> --out=<path-to-output-dir>
 
   * You can also use -o instead of --out
-  
+
 Contribute
 ----------
 Did you think in some interesting feature, or have you found a bug? Please let me know!

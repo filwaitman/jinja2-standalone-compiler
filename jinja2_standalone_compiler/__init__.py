@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, print_function
 import argparse
 import fnmatch
 import imp
@@ -7,7 +7,6 @@ import re
 import sys
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, defaults
-
 
 try:
     from colorama import init, Fore, Style
@@ -39,7 +38,7 @@ def print_log(msg, verbose_msg=False, verbose=False, silent=False):
     if not verbose and verbose_msg:
         return
 
-    print msg
+    print(msg)
 
 
 def render_template(jinja_template, extra_variables, output_options, jinja_environment):
@@ -136,7 +135,7 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
                     extra_variables=extra_variables,
                     output_options=output_options,
                     jinja_environment=jinja_environment
-                ).encode('utf-8'))
+                ))
         except:
             os.unlink(template_file)
             raise
@@ -173,7 +172,7 @@ def main_command(path=None, settings=None, out=None, verbose=None, silent=None):
     current_dir = os.getcwd()
 
     if not using_colorama and not silent:
-        print "<optional dependency 'colorama' not found, try 'pip install colorama==0.3.7' to see colored output>"
+        print("<optional dependency 'colorama' not found, try 'pip install colorama==0.3.7' to see colored output>")
 
     if out and not os.path.exists(out):
         out = os.path.normpath(out)
