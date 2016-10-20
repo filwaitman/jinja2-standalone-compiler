@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+import argparse
 import fnmatch
 import imp
 import os
 import re
 import sys
 
-import click
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, defaults
 
 
@@ -142,14 +142,34 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
             raise
 
 
-@click.command()
-@click.argument('path', type=click.Path(exists=True))
-@click.option('--settings', '-s', default=None, multiple=True, help='Settings file to use.')
-@click.option('--out', '-o', type=click.Path(exists=False, file_okay=False, dir_okay=True),
-              default=None, help='Output path to use.')
-@click.option('--verbose', is_flag=True, default=False, help='Detailed command line output')
-@click.option('--silent', is_flag=True, default=False, help='Suppress command line output')
-def main_command(path, settings=None, out=None, verbose=False, silent=False):
+def _first_set(*values):
+    for value in values:
+        if value is not None:
+            return value
+
+
+def main_command(path=None, settings=None, out=None, verbose=None, silent=None):
+    has_path = bool(path)
+    path_help = '{}Path to base files.'.format('' if has_path else '[REQUIRED] ')
+
+    parser = argparse.ArgumentParser(description='jinja2_standalone_compiler')
+    parser.add_argument('--path', dest='path', help=path_help, required=not(has_path))
+    parser.add_argument('--settings', '-s', dest='settings', action='append', nargs=1, help='Settings file(s) to use.')
+    parser.add_argument('--out', '-o', dest='out', help='Output path.')
+    parser.add_argument('--verbose', dest='verbose', help='Detailed output.', action='store_true', default=False)
+    parser.add_argument('--silent', dest='silent', help='Suppress output.', action='store_true', default=False)
+    args = parser.parse_args()
+
+    args_settings = None
+    if args.settings:
+        args_settings = [x[0] for x in args.settings]
+
+    path = _first_set(path, args.path)
+    settings = _first_set(settings, args_settings)
+    out = _first_set(out, args.out)
+    verbose = _first_set(verbose, args.verbose)
+    silent = _first_set(silent, args.silent)
+
     current_dir = os.getcwd()
 
     if not using_colorama and not silent:
