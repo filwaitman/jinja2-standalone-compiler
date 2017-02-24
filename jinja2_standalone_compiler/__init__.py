@@ -138,6 +138,8 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
 
         print_log('  Creating: ' + style_RENDERED_FILE + template_file, False, verbose, silent)
 
+        if os.path.abspath(jinja_template) == os.path.abspath(template_file):
+            raise IOError("write target is also a source file, aborting to prevent blanking")
         try:
             with open(template_file, 'w') as f:
                 f.write(render_template(
