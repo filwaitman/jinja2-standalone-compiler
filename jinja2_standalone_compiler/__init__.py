@@ -41,9 +41,9 @@ def print_log(msg, verbose_msg=False, verbose=False, silent=False):
     print(msg)
 
 
-def render_template(jinja_template, extra_variables, output_options, jinja_environment):
+def render_template(jinja_template, extra_variables, output_options, jinja_environment, template_root):
     environment = Environment(
-        loader=FileSystemLoader([os.path.dirname(jinja_template)]),
+        loader=FileSystemLoader(template_root),
         block_start_string=jinja_environment.get('BLOCK_START_STRING', defaults.BLOCK_START_STRING),
         block_end_string=jinja_environment.get('BLOCK_END_STRING', defaults.BLOCK_END_STRING),
         variable_start_string=jinja_environment.get('VARIABLE_START_STRING', defaults.VARIABLE_START_STRING),
@@ -58,7 +58,15 @@ def render_template(jinja_template, extra_variables, output_options, jinja_envir
         keep_trailing_newline=jinja_environment.get('KEEP_TRAILING_NEWLINE', defaults.KEEP_TRAILING_NEWLINE)
     )
     environment.undefined = StrictUndefined
-    template = environment.get_template(os.path.basename(jinja_template))
+
+    dirname = os.path.dirname(jinja_template)
+
+    relpath = os.path.relpath(dirname, template_root)
+    basename = os.path.basename(jinja_template)
+
+    filename = os.path.join(relpath, basename)
+
+    template = environment.get_template(filename)
     return template.render(extra_variables)
 
 
@@ -80,11 +88,13 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
 
     if os.path.isdir(path):
         print_log('Looking for jinja templates in: {}{}'.format(style_JINJA_FILE, path), False, verbose, silent)
+        template_root = path
         jinja_templates = []
         for root, dirnames, filenames in os.walk(path):
             for filename in fnmatch.filter(filenames, '*.jinja*'):
                 jinja_templates.append(os.path.join(root, filename))
     else:
+        template_root = os.path.dirname(path)
         jinja_templates = [path, ]  # path is just a file, actually
 
     print_log('  Jinja files found: {}{}'.format(style_JINJA_FILE, len(jinja_templates)), False, verbose, silent)
@@ -134,7 +144,8 @@ def main(path, out_path=None, verbose=False, silent=False, settings=None):
                     jinja_template,
                     extra_variables=extra_variables,
                     output_options=output_options,
-                    jinja_environment=jinja_environment
+                    jinja_environment=jinja_environment,
+                    template_root=template_root
                 ))
         except:
             os.unlink(template_file)
