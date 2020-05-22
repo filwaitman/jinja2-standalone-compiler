@@ -1,3 +1,8 @@
+THIS PROJECT IS ARCHIVED AND UNMAINTAINED. There are plenty alternatives to this, such as:
+* https://github.com/kolypto/j2cli
+* https://github.com/mattrobenolt/jinja2-cli
+
+
 Jinja2 Standalone Compiler
 ===========================
 
